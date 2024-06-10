@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Text</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@chgibb/css-spinners@2.2.1/css/spinner/three-quarters.min.css">
+    <style>
+            button, input[type="submit"] {
+                border-radius: var(--border-radius);
+                display: inline-block;
+                font-size: medium;
+                font-weight: bold;
+                line-height: var(--line-height);
+                margin: 0.5rem 0;
+                padding: 0rem 1rem;
+            }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <form id="name-form" style="margin: 0 auto">
+                <h1>Upload Text</h1>
+                <input type="file" name="file" @change="uploadFile($event)">
+              
+                <button id="magic-button" type="button" class="center" @click.prevent="processFile" v-if="!is_loading">Process</button>
+                <button id="magic-button" type="button" class="center" v-if="is_loading"> Processing.......</button>
+                <hr/>
+                Or Write some text
+                <textarea name="" id="" v-model="text_for_process" rows="10" cols="50"></textarea>
+                <button id="magic-button" type="button" class="center" @click.prevent="processText" v-if="!is_loading_text">Process</button>
+                <button id="magic-button" type="button" class="center" v-if="is_loading_text"> Processing.......</button>
+            </form>
+        </header>
+        <div id="spinner" style="text-align: center; display: none">
+            <span class="three-quarters-loader"
+                style="width: 100px; height: 100px; border-radius: 50%; border-width: 12px;"></span>
+        </div>
+        <main id="result" v-if="result && result.length > 0">
+            <div style="text-align: center" v-if="result && result.length > 0">
+               [[ result ]]
+            </div>
+            <button type="button" @click.prevent="downloadResult">Download</button>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.min.js"
+        integrity="sha512-gEM2INjX66kRUIwrPiTBzAA6d48haC9kqrWZWjzrtnpCtBNxOXqXVFEeRDOeVC13pw4EOBrvlsJnNr2MXiQGvg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const { createApp } = Vue
+        createApp({
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    result: null,
+                    file_upload: null,
+                    is_loading: false,
+                    is_loading_text: false,
+                    text_for_process: null,
+                    upload_type: null
+                }
+            },
+            methods: {
+                downloadResult() {
+                    console.log('download triggered')
+                },
+                uploadFile(event) {
+                    this.file_upload = event
+                },
+                async processText() {
+                    this.uploadFile(null);
+                    this.is_loading_text = true;
+                    const formData = new FormData()
+                    this.upload_type = 'text'
+                    formData.append('type', this.upload_type);
+                    formData.append('text', this.text_for_process)
+                    await this.processUpload(formData)
+                },
+                async processFile() {
+                    this.text_for_process = null;
+                    this.is_loading = true;
+                    this.upload_type = 'file'
+                    const event = this.file_upload;
+                    const file = event.target.files[0];
+                    if (!file)  {
+                        console.log('no file')
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('type', this.upload_type);
+                    await this.processUpload(formData)
+                },
+                async processUpload(formData) {
+                    try {
+                        const response = await axios.post('/process', formData);
+                        console.log(response,'the respinse')
+                        const {message, data, error} = response.data
+                        if (error) {
+                            alert(message)
+                            return
+                        }
+                        this.result = data
+                        console.log('success')
+                    } catch (error) {
+                        console.error('Error uploading file:', error);
+                    } finally{
+                        this.is_loading = false;
+                        this.is_loading_text = false;
+                    }
+                },
+                async downloadResult() {
+                    axios.get('/download', {
+                        responseType: 'blob'
+                    })
+                    .then((res) => {
+                        const contentDisposition = res.headers["content-disposition"];
+                        let filename = `file.txt`
+
+                        const url = window.URL.createObjectURL(new Blob([res.data]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', filename);
+                        document.body.appendChild(link);
+                        link.click();
+
+                    })
+                    .catch((err) => {
+                        console.log(err.toString())
+                    })
+                }
+            }
+        }).mount("#app")
+    </script>
+</body>
+</html>
