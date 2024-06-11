@@ -1,6 +1,7 @@
 from llmtool.scripts.sample_app import run
-if __name__ == '__main__':
-    print('running')
+
+if __name__ == "__main__":
+    print("running")
     # Input text for summarization
     text = """
     Hugging blah blah blah Face has democratized AI by providing open-source resources and pre-trained models for a variety of NLP tasks. 

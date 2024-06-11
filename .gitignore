@@ -131,3 +131,6 @@ bin
 lib64
 share
 pyvenv.cfg
+ONLYME.md
+llms.pem
+file.txt

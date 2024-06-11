@@ -6,8 +6,9 @@ from flask import Flask
 
 
 from llmtool.blueprints import text_parser
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 def create_app():
