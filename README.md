@@ -40,4 +40,6 @@ This test app is hosted in AWS ec2 instance https://llm.ianrusseladem.com/
 
 But this will not run properly as the free tier resources is not enough to run this app.
 
+A short video instead is shared in the link https://www.loom.com/share/ee4b2d9806cb47a19afa0029ce90125c?sid=24b2447d-48dd-4e47-9866-903f5a10f414
+
 # llmtest
