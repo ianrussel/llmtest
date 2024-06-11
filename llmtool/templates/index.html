@@ -41,7 +41,7 @@
                 style="width: 100px; height: 100px; border-radius: 50%; border-width: 12px;"></span>
         </div>
         <main id="result" v-if="result && result.length > 0">
-            <div style="text-align: center" v-if="result && result.length > 0">
+            <div v-if="result && result.length > 0">
                [[ result ]]
             </div>
             <button type="button" @click.prevent="downloadResult">Download</button>
@@ -82,10 +82,14 @@
                     await this.processUpload(formData)
                 },
                 async processFile() {
+                    const event = this.file_upload;
+                    if (!event) {
+                        alert('file is required')
+                        return
+                    }
                     this.text_for_process = null;
                     this.is_loading = true;
                     this.upload_type = 'file'
-                    const event = this.file_upload;
                     const file = event.target.files[0];
                     if (!file)  {
                         console.log('no file')
