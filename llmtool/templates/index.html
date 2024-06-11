@@ -92,7 +92,7 @@
                     this.upload_type = 'file'
                     const file = event.target.files[0];
                     if (!file)  {
-                        console.log('no file')
+                        alert('no file')
                         return;
                     }
 
@@ -104,14 +104,12 @@
                 async processUpload(formData) {
                     try {
                         const response = await axios.post('/process', formData);
-                        console.log(response,'the respinse')
                         const {message, data, error} = response.data
                         if (error) {
                             alert(message)
                             return
                         }
                         this.result = data
-                        console.log('success')
                     } catch (error) {
                         console.error('Error uploading file:', error);
                     } finally{
